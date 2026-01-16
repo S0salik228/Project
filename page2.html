@@ -116,25 +116,6 @@
     })
     .then(data => console.log(data))
     .catch(error => console.error('Ошибка:', error));
-}
-            {
-                    messageDiv.textContent = 'Текст успешно отправлен на сервер.'; // Выводим сообщение об успехе
-                    messageDiv.style.color = 'green'; // Делаем сообщение зеленым
-                } else {
-                    messageDiv.textContent = 'Ошибка при отправке текста на сервер.'; // Выводим сообщение об ошибке
-                    messageDiv.style.color = 'red'; // Делаем сообщение красным
-                }
-                return response.json(); // Возвращаем JSON-ответ
-            })
-            .then(data => {
-                console.log('Ответ от сервера:', data); // Логируем ответ от сервера
-            })
-            .catch(error => {
-                console.error('Ошибка:', error); // Логируем ошибку
-                messageDiv.textContent = 'Произошла ошибка при отправке данных.'; // Выводим сообщение об ошибке
-                messageDiv.style.color = 'red'; // Делаем сообщение красным
-            });
-        }
     </script>
 </body>
 </html>
