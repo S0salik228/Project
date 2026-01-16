@@ -100,8 +100,10 @@
     </div>
 
     <script>
-        document.getElementById('submitButton').addEventListener('click', () => 
-            {
+        function sendTextToServer() {
+            let text = document.getElementById("userText").value;
+            let messageDiv = document.getElementById("message");
+
                 fetch('http://192.168.1.70>:5000/api/data', {
                     method: 'POST',
                     headers: {
