@@ -1,53 +1,96 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Отправка данных</title>
+<html>
+        .bottom-image-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .bottom-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .input-container {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        #userText {
+            padding: 10px;
+            width: 60%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Чем опасны сайты?</h1>
+        <p>Конечно, это текстовыми полями, гиперссылками, даже в изображении может быть опасность</p>
 
-    <input type="text" id="userInput" placeholder="Введите текст...">
-    <button onclick="sendToServer()">Отправить</button>
-    
-    <!-- Тот самый блок для сообщений, который ищет ваш скрипт -->
-    <div id="messageDiv" style="margin-top: 20px; font-weight: bold;"></div>
+        <div class="input-container">
+            <label for="userText">Введите текст (он сохранится в базу данных):</label><br><br>
+            <input type="text" id="userText" name="userText" placeholder="Напишите что-нибудь...">
+            <button class="my-button" onclick="sendTextToServer()">Отправить на сервер</button>
+            <div id="message"></div>
+        </div>
+
+        <div class="button-container">
+            <a href="index.html">
+                <button class="my-button">Вернуться на главную страницу</button>
+            </a>
+            <a href="https://ivanovo.postupi.online/ssuz/ivpek/" target="_blank">
+                <button class="my-button">Поступи в ИВПЭК</button>
+            </a>
+            <a href="page3.html">
+                <button class="my-button">Перейти на страницу 3</button>
+            </a>
+        </div>
+
+        <div class="bottom-image-container">
+            <img src="images/RickrollingQRcode.png" alt="Шпион ФСБ" class="bottom-image">
+        </div>
+    </div>
 
     <script>
-        function sendToServer() {
-            const textValue = document.getElementById('userInput').value;
-            const messageDiv = document.getElementById('messageDiv');
+        function sendTextToServer() {
+            let textField = document.getElementById("userText");
+            let textValue = textField.value;
+            let messageDiv = document.getElementById("message");
 
-            // Очищаем предыдущие сообщения
-            messageDiv.textContent = 'Отправка...';
-            messageDiv.style.color = 'black';
+            if (!textValue) {
+                messageDiv.textContent = "Сначала введите текст!";
+                messageDiv.style.color = "red";
+                return;
+            }
 
-            fetch('http://127.0.0.1:5000/save', {
+            // Отправляем данные на локальный Python сервер
+            fetch('http://127.0.0.1:5000/submit', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ text: textValue })
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json().then(data => {
-                        messageDiv.textContent = data.message;
-                        messageDiv.style.color = 'green';
-                        document.getElementById('userInput').value = ''; // Очистить поле
-                    });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    messageDiv.textContent = 'Успех: ' + data.message;
+                    messageDiv.style.color = 'green';
+                    textField.value = ""; // Очистить поле
                 } else {
-                    // ВАШ ФРАГМЕНТ НАЧИНАЕТСЯ ЗДЕСЬ
-                    messageDiv.textContent = 'Ошибка при отправке текста на сервер.'; 
-                    messageDiv.style.color = 'red'; 
-                    console.error('Ошибка при отправке текста на сервер.');
-                    // ВАШ ФРАГМЕНТ ЗАКАНЧИВАЕТСЯ
+                    messageDiv.textContent = 'Ошибка сервера.';
+                    messageDiv.style.color = 'red';
                 }
             })
             .catch(error => {
-                // ВАШ ФРАГМЕНТ ДЛЯ СЕТЕВОЙ ОШИБКИ
-                messageDiv.textContent = 'Ошибка сети: ' + error; 
-                messageDiv.style.color = 'red'; 
-                console.error('Ошибка сети:', error);
+                console.error('Error:', error);
+                messageDiv.textContent = 'Ошибка: сервер Python не запущен!';
+                messageDiv.style.color = 'red';
             });
         }
     </script>
