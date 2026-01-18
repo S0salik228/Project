@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Вторая страница проекта по информатике</title>
+    <title>Отправка данных</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,52 +71,51 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Чем опасны сайты?</h1>
-        <p>Конечно, это текстовыми полями, гиперссылками, даже в изображении может быть опасность.</p>
 
-        <div class="input-container">
-            <label for="userText">Введите текст:</label>
-            <input type="text" id="userText" name="userText">
-            <button onclick="sendTextToServer()">Отправить на сервер</button>
-            <div id="message"></div> <!-- Здесь будет отображаться сообщение -->
-        </div>
-
-        <div class="button-container">
-            <a href="index.html">
-                <button class="my-button">Вернуться на главную страницу</button>
-            </a>
-            <a href="https://ivanovo.postupi.online/ssuz/ivpek/" target="_blank">
-                <button class="my-button">Поступи в ИВПЭК</button>
-            </a>
-           <a href="page3.html">  <!-- Добавлена ссылка на страницу 3 -->
-                <button class="my-button">Перейти на страницу 3</button>
-            </a>
-        </div>
-
-        <!-- Контейнер для изображения внизу -->
-        <div class="bottom-image-container">
-            <img src="images/RickrollingQRcode.png" alt="Шпион ФСБ" class="bottom-image">
-        </div>
-    </div>
+    <input type="text" id="userInput" placeholder="Введите текст...">
+    <button onclick="sendToServer()">Отправить</button>
+    
+    <!-- Тот самый блок для сообщений, который ищет ваш скрипт -->
+    <div id="messageDiv" style="margin-top: 20px; font-weight: bold;"></div>
 
     <script>
-        function sendTextToServer() {
-    fetch('http://127.0.0.1:5001/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ key: 'value' }) // Ваши данные
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Сеть ответила с ошибкой');
+        function sendToServer() {
+            const textValue = document.getElementById('userInput').value;
+            const messageDiv = document.getElementById('messageDiv');
+
+            // Очищаем предыдущие сообщения
+            messageDiv.textContent = 'Отправка...';
+            messageDiv.style.color = 'black';
+
+            fetch('http://127.0.0.1:5000/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: textValue })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json().then(data => {
+                        messageDiv.textContent = data.message;
+                        messageDiv.style.color = 'green';
+                        document.getElementById('userInput').value = ''; // Очистить поле
+                    });
+                } else {
+                    // ВАШ ФРАГМЕНТ НАЧИНАЕТСЯ ЗДЕСЬ
+                    messageDiv.textContent = 'Ошибка при отправке текста на сервер.'; 
+                    messageDiv.style.color = 'red'; 
+                    console.error('Ошибка при отправке текста на сервер.');
+                    // ВАШ ФРАГМЕНТ ЗАКАНЧИВАЕТСЯ
+                }
+            })
+            .catch(error => {
+                // ВАШ ФРАГМЕНТ ДЛЯ СЕТЕВОЙ ОШИБКИ
+                messageDiv.textContent = 'Ошибка сети: ' + error; 
+                messageDiv.style.color = 'red'; 
+                console.error('Ошибка сети:', error);
+            });
         }
-        return response.json();
-    })
-    .then(data => console.log(data))
-    .catch(error => console.error('Ошибка:', error));
     </script>
 </body>
 </html>
